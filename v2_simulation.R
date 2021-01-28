@@ -1,6 +1,6 @@
 library("boot")
 
-GetMatrix <- function(n, p, c, d.distr) {
+GetMatrix <- function(n, p, c, d.distr = 1) {
   # Creates an n*p data matrix x. x can have different structures. And the 
   # top eigenvalue of its sample covariance is lambda1 which is greater than 1  
   # while the rest eigenvalues are all 1.
