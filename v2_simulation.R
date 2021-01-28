@@ -37,7 +37,7 @@ GetMatrix <- function(n, p, c, d.distr) {
   } else if (d.distr == 3) {
     d.ii <- rexp(n, sqrt(2))
   } else {
-    stop("Please choose from '1', '2' and '3'")
+    stop("Please choose from '1', '2' and '3'.")
   }
   d <- diag(d.ii)
   z0 <- matrix(rnorm(n*p), nrow = n)
