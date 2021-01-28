@@ -20,7 +20,6 @@ GetMatrix <- function(n, p, c, d.distr) {
   #      if 3, d.ii will be i.i.d Exp(sqrt(2)).
   #      Default is "1".
   #      
-  # 
   # Returns:
   #   The n*p data matrix x. x is the product of the following matrices in order:
   #     d: An n*n diagnial matrix. The distribution of its diagonal entries is  
