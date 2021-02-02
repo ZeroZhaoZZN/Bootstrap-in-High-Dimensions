@@ -131,12 +131,12 @@ PerfSimulation <- function(N, B, n, p, c, d.distr = 1) {
   return(outcome)
 }
 
-# Simulations for different values of c and r when N = 500, B = 200, n = 300 ----
+# Simulations for different values of c and r when N = 500, B = 100, n = 300 ----
 simu.result <- NA
 for (c in c(0, 3, 11, 50, 100)) {
   for (p in c(3, 30, 100, 150)) {
       simu.result <- rbind(simu.result,
-                           PerfSimulation(N = 200, B = 100, n = 300,
+                           PerfSimulation(N = 500, B = 100, n = 300,
                                           p = p, c = c, d.distr = 1))
   }
 }
@@ -144,9 +144,24 @@ simu.result <- simu.result[-1, ]
 
 # plot the bias
 simu.data.plot <- simu.result %>%
-  mutate(r = as.character(r)) %>%
-  mutate(c = as.character(c)) %>%
-  mutate(bias.scaled = bias.boot/true.lambda1)
+  mutate(r = factor(r)) %>%
+  mutate(c = factor(c)) %>%
+  mutate(bias.scaled = abs(bias.boot)/true.lambda1)
+
+labels <- c(expression(lambda[1]*"="*1),
+            expression(lambda[1]*"="*1 + 3*sqrt(r)),
+            expression(lambda[1]*"="*1 + 11*sqrt(r)),
+            expression(lambda[1]*"="*1 + 50*sqrt(r)),
+            expression(lambda[1]*"="*1 + 100*sqrt(r)))
+
 ggplot(simu.data.plot, aes(x = r, y = bias.scaled)) +
-  geom_boxplot(aes(fill = c)) +
-  stat_summary(fun = "median", geom = "line", aes(group = c), size = .5)
+  geom_boxplot(aes(fill = c), outlier.size = 1, outlier.shape = NA) +
+  stat_summary(fun = "median", 
+               geom = "line",
+               size = .5,
+               aes(group = c, color = c),  
+               position = position_dodge(0.75)) +
+  scale_x_discrete(labels = c("0.01", "0.1", "0.3", "0.5")) +
+  theme(legend.title = element_blank()) +
+  scale_color_discrete(labels = labels) +
+  scale_fill_discrete(labels = labels)
