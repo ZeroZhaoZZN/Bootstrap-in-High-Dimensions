@@ -80,7 +80,7 @@ PerfSimulation <- function(N, B, n, p, c, d.distr = 1) {
   # Perform the simulation for N times.
   # For each simulation, create an n*p matrix with function "GetMatrix()" and 
   # get the bootstrap estimate of the top eigenvalue of its sample covariance 
-  # matrix as well as the bootstrap estimate of its bia and standard error.The 
+  # matrix as well as the bootstrap estimate of its bias and standard error.The 
   # number of the bootstrap samples for each simulation is B.
   #
   # Args:
@@ -92,9 +92,9 @@ PerfSimulation <- function(N, B, n, p, c, d.distr = 1) {
   #   A data frame of:
   #     $lambda1.hat: The top eigenvalues of sample covariance matrices
   #                   (i.e. the statistic of interest) for these N simulations.
-  #     $bias.boot: The bootstrap estimate of bias of the top eigenvalues
+  #     $bias.boot: The bootstrap estimates of bias of the top eigenvalues
   #                 for these N simulations.
-  #     $std.err.boot: The bootstrap estimate of standard errors of the 
+  #     $std.err.boot: The bootstrap estimates of standard errors of the 
   #                    top eigenvalues for these N simulations.
   #     $c: One of the arguments from "GetMatrix()". lambda1 = 1 + c*sqrt(p/n).
   #     $r: p/n (i.e. number of rows of the original data matrix divided by 
@@ -195,13 +195,13 @@ labels <- c(expression(lambda[1]*"="*1),
 norm.data.plot <- simu.norm %>%
   mutate(r = factor(r)) %>%
   mutate(c = factor(c)) %>%
-  mutate(bias.scaled = abs(bias.boot)/true.lambda1) %>%
+  mutate(bias.ratio = abs(bias.boot)/true.bias) %>%
   mutate(variance.ratio = (std.err.boot/true.std.err)^2)
 
-bias.scaled.lim1 <- boxplot.stats(norm.data.plot$bias.scaled)$stats[c(1, 5)]
+bias.ratio.lim1 <- boxplot.stats(norm.data.plot$bias.ratio)$stats[c(1, 5)]
 variance.ratio.lim1 <- boxplot.stats(norm.data.plot$variance.ratio)$stats[c(1, 5)]
 
-p.norm.bias <- ggplot(norm.data.plot, aes(x = r, y = bias.scaled)) +
+p.norm.bias <- ggplot(norm.data.plot, aes(x = r, y = bias.ratio)) +
   geom_boxplot(aes(fill = c), outlier.size = 1, outlier.shape = NA) +
   stat_summary(fun = "median", 
                geom = "line",
@@ -212,9 +212,9 @@ p.norm.bias <- ggplot(norm.data.plot, aes(x = r, y = bias.scaled)) +
   theme(legend.title = element_blank()) +
   scale_color_discrete(labels = labels) +
   scale_fill_discrete(labels = labels) +
-  coord_cartesian(ylim = bias.scaled.lim1*2.5) +
+  coord_cartesian(ylim = bias.ratio.lim1*6) +
   labs(title = expression(
-    frac(bar(lambda[1]^{"*"}) - widehat(lambda[1]), lambda[1]) * " against r (Z ~ Norm)"))
+    frac("Bootstrap estimate of bias", "True bias") * " against r (Z ~ Norm)"))
 p.norm.bias
 
 p.norm.var <- ggplot(norm.data.plot, aes(x = r, y = variance.ratio)) +
@@ -238,13 +238,13 @@ p.norm.var
 ellip.norm.data.plot <- simu.ellip.norm %>%
   mutate(r = factor(r)) %>%
   mutate(c = factor(c)) %>%
-  mutate(bias.scaled = abs(bias.boot)/true.lambda1) %>%
+  mutate(bias.ratio = abs(bias.boot)/true.bias) %>%
   mutate(variance.ratio = (std.err.boot/true.std.err)^2)
 
-bias.scaled.lim2 <- boxplot.stats(ellip.norm.data.plot$bias.scaled)$stats[c(1, 5)]
+bias.ratio.lim2 <- boxplot.stats(ellip.norm.data.plot$bias.ratio)$stats[c(1, 5)]
 variance.ratio.lim2 <- boxplot.stats(ellip.norm.data.plot$variance.ratio)$stats[c(1, 5)]
 
-p.ellip.norm.bias <- ggplot(ellip.norm.data.plot, aes(x = r, y = bias.scaled)) +
+p.ellip.norm.bias <- ggplot(ellip.norm.data.plot, aes(x = r, y = bias.ratio)) +
   geom_boxplot(aes(fill = c), outlier.size = 1, outlier.shape = NA) +
   stat_summary(fun = "median", 
                geom = "line",
@@ -255,10 +255,9 @@ p.ellip.norm.bias <- ggplot(ellip.norm.data.plot, aes(x = r, y = bias.scaled)) +
   theme(legend.title = element_blank()) +
   scale_color_discrete(labels = labels) +
   scale_fill_discrete(labels = labels) +
-  coord_cartesian(ylim = bias.scaled.lim2*3.5) +
+  coord_cartesian(ylim = bias.ratio.lim2*1.8) +
   labs(title = expression(
-    frac(bar(lambda[1]^{"*"}) - widehat(lambda[1]), lambda[1]) *
-    " against r (Z ~ Ellip Norm)"))
+    frac("Bootstrap estimate of bias", "True bias") * " against r (Z ~ Norm)"))
 p.ellip.norm.bias
 
 p.ellip.norm.var <- ggplot(ellip.norm.data.plot, aes(x = r, y = variance.ratio)) +
@@ -283,13 +282,13 @@ p.ellip.norm.var
 ellip.unif.data.plot <- simu.ellip.unif %>%
   mutate(r = factor(r)) %>%
   mutate(c = factor(c)) %>%
-  mutate(bias.scaled = abs(bias.boot)/true.lambda1) %>%
+  mutate(bias.ratio = abs(bias.boot)/true.bias) %>%
   mutate(variance.ratio = (std.err.boot/true.std.err)^2)
 
-bias.scaled.lim3 <- boxplot.stats(ellip.unif.data.plot$bias.scaled)$stats[c(1, 5)]
+bias.ratio.lim3 <- boxplot.stats(ellip.unif.data.plot$bias.ratio)$stats[c(1, 5)]
 variance.ratio.lim3 <- boxplot.stats(ellip.unif.data.plot$variance.ratio)$stats[c(1, 5)]
 
-p.ellip.unif.bias <- ggplot(ellip.unif.data.plot, aes(x = r, y = bias.scaled)) +
+p.ellip.unif.bias <- ggplot(ellip.unif.data.plot, aes(x = r, y = bias.ratio)) +
   geom_boxplot(aes(fill = c), outlier.size = 1, outlier.shape = NA) +
   stat_summary(fun = "median", 
                geom = "line",
@@ -300,10 +299,9 @@ p.ellip.unif.bias <- ggplot(ellip.unif.data.plot, aes(x = r, y = bias.scaled)) +
   theme(legend.title = element_blank()) +
   scale_color_discrete(labels = labels) +
   scale_fill_discrete(labels = labels) +
-  coord_cartesian(ylim = bias.scaled.lim3*3) +
+  coord_cartesian(ylim = bias.ratio.lim3*4.5) +
   labs(title = expression(
-    frac(bar(lambda[1]^{"*"}) - widehat(lambda[1]), lambda[1]) *
-    " against r (Z ~ Ellip Uniform)"))
+    frac("Bootstrap estimate of bias", "True bias") * " against r (Z ~ Norm)"))
 p.ellip.unif.bias
 
 p.ellip.unif.var <- ggplot(ellip.unif.data.plot, aes(x = r, y = variance.ratio)) +
@@ -328,13 +326,13 @@ p.ellip.unif.var
 ellip.exp.data.plot <- simu.ellip.exp %>%
   mutate(r = factor(r)) %>%
   mutate(c = factor(c)) %>%
-  mutate(bias.scaled = abs(bias.boot)/true.lambda1) %>%
+  mutate(bias.ratio = abs(bias.boot)/true.bias) %>%
   mutate(variance.ratio = (std.err.boot/true.std.err)^2)
 
-bias.scaled.lim4 <- boxplot.stats(ellip.exp.data.plot$bias.scaled)$stats[c(1, 5)]
+bias.ratio.lim4 <- boxplot.stats(ellip.exp.data.plot$bias.ratio)$stats[c(1, 5)]
 variance.ratio.lim4 <- boxplot.stats(ellip.exp.data.plot$variance.ratio)$stats[c(1, 5)]
 
-p.ellip.exp.bias <- ggplot(ellip.exp.data.plot, aes(x = r, y = bias.scaled)) +
+p.ellip.exp.bias <- ggplot(ellip.exp.data.plot, aes(x = r, y = bias.ratio)) +
   geom_boxplot(aes(fill = c), outlier.size = 1, outlier.shape = NA) +
   stat_summary(fun = "median", 
                geom = "line",
@@ -345,10 +343,9 @@ p.ellip.exp.bias <- ggplot(ellip.exp.data.plot, aes(x = r, y = bias.scaled)) +
   theme(legend.title = element_blank()) +
   scale_color_discrete(labels = labels) +
   scale_fill_discrete(labels = labels) +
-  coord_cartesian(ylim = bias.scaled.lim4*4) +
+  coord_cartesian(ylim = bias.ratio.lim4*1) +
   labs(title = expression(
-    frac(bar(lambda[1]^{"*"}) - widehat(lambda[1]), lambda[1]) *
-    " against r (Z ~ Ellip Exp)"))
+    frac("Bootstrap estimate of bias", "True bias") * " against r (Z ~ Norm)"))
 p.ellip.exp.bias
 
 p.ellip.exp.var <- ggplot(ellip.exp.data.plot, aes(x = r, y = variance.ratio)) +
