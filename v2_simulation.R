@@ -71,7 +71,10 @@ GetTopEigenvalue <- function(x, indices) {
   #   The top eigenvalue of x's sample covariance matrix.
   
   data <- x[indices, ]
-  lambda1.hat <- max(eigen(cov(data))$values)
+  t.data <- t(data)
+  cov.matrix <- 
+    (t.data - rowMeans(t.data)) %*% t(t.data - rowMeans(t.data))/(nrow(data)-1)
+  lambda1.hat <- max(eigen(cov.matrix)$values)
   
   return(lambda1.hat)
 }
